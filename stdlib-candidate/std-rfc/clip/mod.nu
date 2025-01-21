@@ -4,23 +4,15 @@
 # > Terminal multiplexers such as screen, tmux, zellij etc may interfere with this command
 
 # Copy input to system clipboard
-#
-# # Example
-# ```nushell
-# >_ "Hello" | clip copy
-# ```
-export def copy []: [string -> nothing] {
+@example "Copy a string to the clipboard" { "Hello" | clip copy }
+export def  copy []: [string -> nothing] {
 	print -n $'(ansi osc)52;c;($in | encode base64)(ansi st)'
 }
 
+
 # Paste contenst of system clipboard
-#
-# # Example
-# ```nushell
-# >_ clip paste
-# "Hello"
-# ```
-export def paste []: [nothing -> string] {
+@example "Paste a string from the clipboard" { clip paste } --result "Hello"
+export def  paste []: [nothing -> string] {
 	try {
 		term query $'(ansi osc)52;c;?(ansi st)' -p $'(ansi osc)52;c;' -t (ansi st)
 	} catch {
