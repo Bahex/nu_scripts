@@ -6,6 +6,9 @@
 # Example:
 #
 # 1..10 | into list
+@example "Convert a range to a list" {
+  1..10 | into list
+} --result [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 export def "into list" []: any -> list {
   let input = $in
   let type = ($input | describe --detailed | get type)

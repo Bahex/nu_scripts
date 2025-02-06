@@ -19,10 +19,10 @@
 #
 # Usage:
 # <input> | kv set <key> <value?>
-#
-# Example:
-# ls ~ | kv set "home snapshot"
-# kv set foo 5
+@example "Store the list of files in the home directory" {
+  ls ~ | kv set "home snapshot"
+}
+@example "Store a number" { kv set foo 5 }
 export def "kv set" [
   key: string
   value_or_closure?: any

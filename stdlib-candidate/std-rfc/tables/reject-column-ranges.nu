@@ -1,10 +1,9 @@
 use ./col-indices.nu *
 
 # Reject a range of columns by their indices
-#
-# Example:
-#
-# ls | reject column-ranges 0 4 5 | first 3
+@example "Reject arbitrary columns" {
+    ls | reject column-ranges 0 4 5 | first 3
+}
 export def "reject column-ranges" [
     ...ranges
 ] {

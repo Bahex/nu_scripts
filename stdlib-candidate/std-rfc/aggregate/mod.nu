@@ -48,26 +48,18 @@ def "error not-a-table" [span: record<start: int, end:int>] {
 }
 
 # Run aggregate operations on output of `group-by --to-table`.
-#
-# # Example
-#
-# - group files by type and extension, and get stats about their sizes
-# ```nushell
-# >_ ls | group-by type { get name | path parse | get extension } --to-table | aggregate size
-# ```
-# 
-# - group data by multiple columns, and run custom aggregate operations
-# ```nushell
-# >_ open movies.csv
-#    | group-by Lead_Studio Genre --to-table
-#    | aggregate Worldwide_Gross Profitability --ops {avg: {math avg}, std: {math stddev}}
-# ```
-#
-# - run aggregate operations without grouping the input
-# ```nushell
-# >_ open movies.csv | aggregate Year
-# ```
-export def main [
+@example "group files by type and extension, and get stats about their sizes" {
+    ls | group-by type { get name | path parse | get extension } --to-table | aggregate size
+}
+@example "group data by multiple columns, and run custom aggregate operations" {
+    open movies.csv
+    | group-by Lead_Studio Genre --to-table
+    | aggregate Worldwide_Gross Profitability --ops {avg: {math avg}, std: {math stddev}}
+}
+@example "run aggregate operations without grouping the input" {
+    open movies.csv | aggregate Year
+}
+export def  main [
     --ops: record, # default = {min: {math min}, avg: {math avg}, max: {math max}, sum: {math sum}}  
     ...columns: cell-path, # columns to perform aggregations on
 ]: [
