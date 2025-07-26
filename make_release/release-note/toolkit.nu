@@ -1,6 +1,22 @@
-#!/usr/bin/env nu
+use std/log
+use std/assert
 
-use std log
+def is-extern-available [command: string] {
+    which --all $command | any { $in.type == external }
+}
+
+def "assert extern-is-available" [...commands: string] {
+    for cmd in $commands {
+        assert (which --all $cmd | any { $in.type == external }) --error-label {
+            text: $"`($cmd)` not found in PATH"
+            span: (metadata $cmd).span
+        }
+    }
+}
+
+export-env {
+    assert extern-is-available git gh
+}
 
 def open-pr [
     repo: path
