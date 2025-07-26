@@ -42,14 +42,14 @@ def clean [repo: path] {
     rm -rf $repo
 }
 
+const example_version = $"0.((version).minor + 1).0"
+const example_date = ((version).build_time | parse '{date} {_}').0.date
+
 # open the release note PR interactively
-#
-# # Example
-#     [this PR](https://github.com/nushell/nushell.github.io/pull/916) has been created with the script
-#     > ./make_release/release-note/create-pr 0.81 2023-06-06
-def main [
-    version: string # the version of the release, e.g. `0.80`
-    date: datetime # the date of the upcoming release, e.g. `2023-05-16`
+@example "Create a PR for the next release" $"create-pr ($example_version) \(($example_date) + 6wk\)"
+export def create-pr [
+    version: string # the version of the release
+    date: datetime # the date of the upcoming release
 ] {
     let repo = ($nu.temp-path | path join (random uuid))
     let branch = $"release-notes-($version)"
