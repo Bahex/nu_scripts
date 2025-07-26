@@ -63,10 +63,13 @@ export def create-pr [
 by opening PRs against the `release-notes-($version)` branch.
 
 ## TODO
-- [ ] PRs that need to land before the release, e.g. [deprecations]\(https://github.com/nushell/nushell/labels/deprecation\) or [removals]\(https://github.com/nushell/nushell/pulls?q=is%3Apr+is%3Aopen+label%3Aremoval-after-deprecation\)
+- [ ] PRs that need to land before the release, e.g. [deprecations] or [removals]
 - [ ] add the full changelog
 - [ ] categorize each PR
-- [ ] write all the sections and complete all the `TODO`s"
+- [ ] write all the sections and complete all the `TODO`s
+
+[deprecations]: https://github.com/nushell/nushell/labels/deprecation
+[removals]: https://github.com/nushell/nushell/pulls?q=is%3Apr+is%3Aopen+label%3Aremoval-after-deprecation"
 
     log info "creating release note from template"
     let release_note = $env.CURRENT_FILE
