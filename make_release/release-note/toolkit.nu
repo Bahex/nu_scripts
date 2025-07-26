@@ -5,11 +5,7 @@ use std log
 def open-pr [
     repo: path
     remote: string
-    pr: record<
-        branch: string
-        title: string
-        body: string
-    >
+    pr: record<branch: string, title: string, body: string>
 ] {
     cd $repo
     gh repo set-default $remote
@@ -17,11 +13,11 @@ def open-pr [
     log info "mock up pr"
     (
         gh pr create
-            --head $pr.branch
-            --base main
-            --title $pr.title
-            --body $pr.body
-            --draft
+        --head $pr.branch
+        --base main
+        --title $pr.title
+        --body $pr.body
+        --draft
     )
 }
 
@@ -58,10 +54,10 @@ by opening PRs against the `release-notes-($version)` branch.
 
     log info "creating release note from template"
     let release_note = $env.CURRENT_FILE
-        | path dirname
-        | path join "template.md"
-        | open
-        | str replace --all "{{VERSION}}" $version
+    | path dirname
+    | path join "template.md"
+    | open
+    | str replace --all "{{VERSION}}" $version
 
     log info $"branch: ($branch)"
     log info $"blog: ($blog_path | str replace $repo "" | path split | skip 1 | path join)"
@@ -80,15 +76,15 @@ by opening PRs against the `release-notes-($version)` branch.
             ^$env.EDITOR $temp_file
             rm --recursive --force $temp_file
         },
-        "no" | "" | _ => {},
+        "no" | "" | _ => { }
     }
 
     match (["no" "yes"] | input list --fuzzy "Open release note PR? ") {
-        "yes" => {},
+        "yes" => { },
         "no" | "" | _ => {
             log warning "aborting."
             return
-        },
+        }
     }
 
     log info "setting up nushell.github.io repo"
@@ -114,10 +110,12 @@ by opening PRs against the `release-notes-($version)` branch.
 
         let pr_url = $"https://github.com/nushell/nushell.github.io/compare/($branch)?expand=1"
         error make --unspanned {
-            msg: ([
-                $out.stderr
-                $"please open the PR manually from a browser (ansi blue_underline)($pr_url)(ansi reset)"
-            ] | str join "\n")
+            msg: (
+                [
+                    $out.stderr
+                    $"please open the PR manually from a browser (ansi blue_underline)($pr_url)(ansi reset)"
+                ] | str join "\n"
+            )
         }
     }
 
