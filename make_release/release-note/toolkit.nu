@@ -24,11 +24,11 @@ def open-pr [
     pr: record<branch: string, title: string, body: string>
 ] {
     cd $repo
-    gh repo set-default $remote
+    ^gh repo set-default $remote
 
     log info "mock up pr"
     (
-        gh pr create
+        ^gh pr create
         --head $pr.branch
         --base main
         --title $pr.title
@@ -104,23 +104,23 @@ by opening PRs against the `release-notes-($version)` branch.
     }
 
     log info "setting up nushell.github.io repo"
-    git clone https://github.com/nushell/nushell.github.io $repo --origin nushell --branch main --single-branch
-    git -C $repo remote set-url nushell --push git@github.com:nushell/nushell.github.io.git
+    ^git clone https://github.com/nushell/nushell.github.io $repo --origin nushell --branch main --single-branch
+    ^git -C $repo remote set-url nushell --push git@github.com:nushell/nushell.github.io.git
 
     log info "creating release branch"
-    git -C $repo checkout -b $branch
+    ^git -C $repo checkout -b $branch
 
     log info "writing release note"
     $release_note | save --force $blog_path
 
     log info "committing release note"
-    git -C $repo add $blog_path
-    git -C $repo commit -m $"($title)\n\n($body)"
+    ^git -C $repo add $blog_path
+    ^git -C $repo commit -m $"($title)\n\n($body)"
 
     log info "pushing release note to nushell"
-    git -C $repo push nushell $branch
+    ^git -C $repo push nushell $branch
 
-    let out = (do -i { gh auth status } | complete)
+    let out = (do -i { ^gh auth status } | complete)
     if $out.exit_code != 0 {
         clean $repo
 
