@@ -88,7 +88,11 @@ by opening PRs against the `release-notes-($version)` branch.
             }
 
             let temp_file = $nu.temp-path | path join $"(random uuid).md"
-            $release_note | save --force $temp_file
+            [
+                "<!-- WARNING: Changes made to this file are NOT included in the PR -->"
+                ""
+                $release_note
+            ] | to text | save --force $temp_file
             ^$env.EDITOR $temp_file
             rm --recursive --force $temp_file
         },
