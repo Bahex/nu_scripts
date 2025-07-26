@@ -19,7 +19,7 @@ export-env {
 }
 
 def open-pr [
-    repo: path
+    repo: directory
     remote: string
     pr: record<branch: string, title: string, body: string>
 ] {
@@ -72,14 +72,11 @@ by opening PRs against the `release-notes-($version)` branch.
 [removals]: https://github.com/nushell/nushell/pulls?q=is%3Apr+is%3Aopen+label%3Aremoval-after-deprecation"
 
     log info "creating release note from template"
-    let release_note = $env.CURRENT_FILE
-    | path dirname
-    | path join "template.md"
-    | open
-    | str replace --all "{{VERSION}}" $version
+    const template = path self template.md
+    let release_note = open $template | str replace --all "{{VERSION}}" $version
 
     log info $"branch: ($branch)"
-    log info $"blog: ($blog_path | str replace $repo "" | path split | skip 1 | path join)"
+    log info $"blog: ($blog_path | path relative-to $repo | path basename)"
     log info $"title: ($title)"
 
     match (["yes" "no"] | input list --fuzzy "Inspect the release note document? ") {
