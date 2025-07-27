@@ -154,6 +154,7 @@ def md-link [text: string link: string] {
 }
 
 # List all merged PRs since the last release
+@example $"List all merged for ($example_version)" $"list-prs --milestone ($example_version)"
 export def list-prs [
     repo: string = 'nushell/nushell' # the name of the repo, e.g. 'nushell/nushell'
     --since: datetime # list PRs on or after this date (defaults to 4 weeks ago if `--milestone` is not provided)
