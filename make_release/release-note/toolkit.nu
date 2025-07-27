@@ -43,13 +43,31 @@ def clean [repo: path] {
 }
 
 const example_version = $"0.((version).minor + 1).0"
-const example_date = ((version).build_time | parse '{date} {_}').0.date
+const current_build_date = ((version).build_time | parse '{date} {_}').0.date
+
+def "nu-complete version" [] { [$example_version] }
+def "nu-complete date" [add?: duration = 0wk] {
+    let date = (
+        ^gh release list
+        --repo "nushell/nushell"
+        --exclude-drafts --exclude-pre-releases
+        --limit 1
+        --json "createdAt"
+    )
+    | from json
+    | $in.0.createdAt
+    | into datetime
+    | $in + $add
+    [{value: ($date | format date '%F') description: ($date | to text -n)}]
+}
+def "nu-complete date current" [] { nu-complete date 0wk }
+def "nu-complete date next" [] { nu-complete date 6wk }
 
 # open the release note PR interactively
-@example "Create a PR for the next release" $"create-pr ($example_version) \(($example_date) + 6wk\)"
+@example "Create a PR for the next release" $"create-pr ($example_version) \(($current_build_date) + 6wk\)"
 export def create-pr [
-    version: string # the version of the release
-    date: datetime # the date of the upcoming release
+    version: string@"nu-complete version" # the version of the release
+    date: datetime@"nu-complete date next" # the date of the upcoming release
 ] {
     let repo = ($nu.temp-path | path join (random uuid))
     let branch = $"release-notes-($version)"
@@ -157,8 +175,8 @@ def md-link [text: string link: string] {
 @example $"List all merged for ($example_version)" $"list-prs --milestone ($example_version)"
 export def list-prs [
     repo: string = 'nushell/nushell' # the name of the repo, e.g. 'nushell/nushell'
-    --since: datetime # list PRs on or after this date (defaults to 4 weeks ago if `--milestone` is not provided)
-    --milestone: string # only list PRs in a certain milestone
+    --since: datetime@"nu-complete date current" # list PRs on or after this date (defaults to 4 weeks ago if `--milestone` is not provided)
+    --milestone: string@"nu-complete version" # only list PRs in a certain milestone
     --label: string # the PR label to filter by, e.g. 'good-first-issue'
 ] {
     mut query_parts = []
