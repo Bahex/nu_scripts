@@ -178,7 +178,7 @@ export def list-prs [
     let query = $query_parts | str join ' '
 
     (
-        gh --repo $repo pr list --state merged
+        ^gh --repo $repo pr list --state merged
         --limit (inf | into int)
         --json author,title,number,mergedAt,url
         --search $query
