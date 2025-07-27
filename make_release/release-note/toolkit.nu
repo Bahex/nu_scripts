@@ -190,12 +190,23 @@ export def list-prs [
 }
 
 # Format the output of `list-prs` as a markdown table
-export def pr-table [] {
-    sort-by author number
-    | update author { md-link $'@($in)' $'https://github.com/($in)' }
-    | insert link {|pr| md-link $'#($pr.number)' $pr.url }
+export def pr-table []: table<author: string, title: string, number: any> -> string {
+    let input = sort-by author number
+    let md_table = $input
+    | update author { $'[($in)]' }
+    | insert link {|pr| $'[#($pr.number)]' }
     | select author title link
-    | to md
+    | to md --pretty
+
+    let refs_author = $input.author | uniq | each {|e| $'[($e)]: https://github.com/($e)' }
+    let refs_pr = $input.number | sort | each {|e| $'[#($e)]: https://github.com/nushell/nushell/pulls/($e)' }
+
+    $md_table
+    | append ""
+    | append $refs_author
+    | append $refs_pr
+    | to text
+    | metadata set --content-type "text/markdown"
 }
 
 const toc = '[[toc](#table-of-contents)]'
