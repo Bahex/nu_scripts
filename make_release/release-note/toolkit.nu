@@ -217,7 +217,7 @@ export def pr-table []: table<author: string, title: string, number: any> -> str
     | to md --pretty
 
     let refs_author = $input.author | uniq | each {|e| $'[($e)]: https://github.com/($e)' }
-    let refs_pr = $input.number | sort | each {|e| $'[#($e)]: https://github.com/nushell/nushell/pulls/($e)' }
+    let refs_pr = $input.number | sort | each {|e| $'[#($e)]: https://github.com/nushell/nushell/pull/($e)' }
 
     $md_table
     | append ""
