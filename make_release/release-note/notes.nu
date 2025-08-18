@@ -12,11 +12,39 @@ const SECTIONS = [
     ["notes:mention", null, null]
 ]
 
+const example_version = $"0.((version).minor + 1).0"
+const current_build_date = ((version).build_time | parse '{date} {_}').0.date
+
+def last-release-date []: nothing -> datetime {
+    if $env.cached-var?.relase-date? == null {
+        $env.cached-var.relase-date = (
+            ^gh release list
+            --repo "nushell/nushell"
+            --exclude-drafts --exclude-pre-releases
+            --limit 1
+            --json "createdAt"
+        )
+        | from json
+        | $in.0.createdAt
+        | into datetime
+    }
+    $env.cached-var.relase-date
+}
+
+def "nu-complete version" [] { [$example_version] }
+def "nu-complete date" [add?: duration = 0wk] {
+    let date = last-release-date | $in + $add
+    [{value: ($date | format date '%F') description: ($date | to text -n)}]
+}
+def "nu-complete date current" [] { nu-complete date 0wk }
+def "nu-complete date next" [] { nu-complete date 6wk }
+
 # List all merged PRs since the last release
+@example $"List all merged for ($example_version)" $"list-prs --milestone ($example_version)"
 export def list-prs [
     repo: string = 'nushell/nushell' # the name of the repo, e.g. 'nushell/nushell'
-    --since: datetime # list PRs on or after this date (defaults to 4 weeks ago if `--milestone` is not provided)
-    --milestone: string # only list PRs in a certain milestone
+    --since: datetime@"nu-complete date current" # list PRs on or after this date (defaults to 4 weeks ago if `--milestone` is not provided)
+    --milestone: string@"nu-complete version" # only list PRs in a certain milestone
     --label: string # the PR label to filter by, e.g. 'good-first-issue'
 ]: nothing -> table {
     query-prs $repo --since=$since --milestone=$milestone --label=$label
